@@ -6,6 +6,28 @@
 
 测试代码
 
+<ul>
+
+{% for post in site.categories.talk %}
+
+    <li>
+
+      <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+
+    </li>
+
+{% endfor %}
+
+</ul>
+
+
+    { % for post in site.categories.talk %}
+    <li class="j-row j-list-i">
+        { {post}}  //输出文章
+    </li>
+    { % endfor %}
+
+
     <!-- exampole -->
     <ul class="j-container">
         { % for post in site.posts %}
@@ -24,9 +46,3 @@
         { % endfor %}
     </ul>
 
-
-    { % for post in site.categories.talk %}
-    <li class="j-row j-list-i">
-        { {post}}  //输出文章
-    </li>
-    { % endfor %}
