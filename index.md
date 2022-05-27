@@ -57,6 +57,23 @@
 
 </ul>
 
+### asdf
+
+<ul>
+
+{% for post in site.categories[love] %}
+
+    <li>
+
+      <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+
+      <p>{{ post.excerpt }}</p>
+
+    </li>
+
+{% endfor %}
+
+</ul>
 
     { % for post in site.categories.talk %}
     <li class="j-row j-list-i">
