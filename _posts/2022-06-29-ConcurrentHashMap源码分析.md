@@ -31,6 +31,7 @@ private transient volatile Node<K,V>[] nextTable;
 | int | HASH_BITS | 0x7fffffff | 使得到的 Hash 值为正数 |
 
 第二件事，是关于sizeCtl各种取值的含义：
+
 | 数据类型 | 数值 | 含义 |
 | ---- |-- | --|
 | int | 正整数 | 初始化之前表示初始化容量                                   |
