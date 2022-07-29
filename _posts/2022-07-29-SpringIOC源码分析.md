@@ -22,7 +22,7 @@ public void refresh() throws BeansException, IllegalStateException {
         //准备工作：记录现在时间、设置容器状态为active、设置打印日志的方式、
         this.prepareRefresh();
 
-        //将配置文件解析为一个个的Bean并注册到配置中心，这时候还没初始化。
+        // 这个方法做两个事，生成BeanFactory还有将用户定义的Bean解析为BeanDefinition
         ConfigurableListableBeanFactory beanFactory = this.obtainFreshBeanFactory();
 
         //准备工作：设置类加载器、添加BeanPostProcessor、注册系统bean、
@@ -30,19 +30,20 @@ public void refresh() throws BeansException, IllegalStateException {
         this.prepareBeanFactory(beanFactory);
 
         try {
-            //调用BeanFactory的postProcessBeanFactory方法
+            // 钩子方法
             this.postProcessBeanFactory(beanFactory);
 
             //调用BeanFactory所有子类的postProcessBeanFactory方法，这时候仅仅完成了注册还没初始化
             this.invokeBeanFactoryPostProcessors(beanFactory);
 
-            //注册BeanPostProcessor为下面调用它的两个回调方法做准备
+            //注册BeanPostProcessor
             this.registerBeanPostProcessors(beanFactory);
 
-            //确保BeanFactory里面有MessageSource Bean和它的父关系Bean
+            // 以后来分析
             this.initMessageSource();
 
-            //创建Spring的事件广播器。详细解析见：https://zimingsir.com/spring/Spring事件广播源码分析.html
+            //创建Spring的事件广播器。
+            // 详细解析见：https://zimingsir.com/spring/Spring事件广播源码分析.html
             this.initApplicationEventMulticaster();
 
             // 模板方法
@@ -185,7 +186,7 @@ public Object getBean(String name) throws BeansException {
 }
 
 // AbstractBeanFactory.java 248
-protected <T> T doGetBean(String name, @Nullable Class<T> requiredType, @Nullable Object[] args, boolean typeCheckOnly) throws BeansException {
+protected <T> T doGetBean(String name, ...) throws BeansException {
 
     // 如果传的是别名或者FactoryBean需要先转换成对应的beanName
     String beanName = transformedBeanName(name);
