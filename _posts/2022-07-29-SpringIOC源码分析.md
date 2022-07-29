@@ -435,5 +435,7 @@ protected Object initializeBean(String beanName, Object bean, @Nullable RootBean
 初始化先调用 InitializingBean的afterPropertiesSet方法，接着调用init-method XMl 标签的方法。
 
 ### 学习IOC过程中收获很多的文章
+
 https://www.javadoop.com/post/spring-ioc 对IOC的整体流程有一个较好的认识
+
 https://blog.csdn.net/cristianoxm/article/details/107311570 通过这个文章学会了Spring是如何解析注解的。
