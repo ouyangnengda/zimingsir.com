@@ -59,7 +59,7 @@ DefaultAdvisorAutoProxyCreator 这个类继承了BeanPostProcessor，实现了 p
 // AbstractAutoProxyCreator.class 286
 public Object postProcessAfterInitialization(@Nullable Object bean, String beanName) {
     if (bean != null) {
-		// 获取bean的唯一标识
+        // 获取bean的唯一标识
         Object cacheKey = getCacheKey(bean.getClass(), beanName);
         if (this.earlyProxyReferences.remove(cacheKey) != bean) {
             return wrapIfNecessary(bean, beanName, cacheKey);
@@ -79,11 +79,11 @@ protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) 
     if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
         return bean;
     }
-	// 这个bean不需要增强就直接返回
+    // 这个bean不需要增强就直接返回
     if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
         return bean;
     }
-	// 如果bean是一个增强、切点等等则不会被代理。第二种情况是IOC的一个特性，以.ORIGINAL作为class路径结尾的也不会被代理。
+    // 如果bean是一个增强、切点等等则不会被代理。第二种情况是IOC的一个特性，以.ORIGINAL作为class路径结尾的也不会被代理。
     if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
         this.advisedBeans.put(cacheKey, Boolean.FALSE);
         return bean;
@@ -92,9 +92,9 @@ protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) 
     // 获取这个类的增强
     Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
     if (specificInterceptors != DO_NOT_PROXY) {
-		// 将bean的代理标记设置为true
+        // 将bean的代理标记设置为true
         this.advisedBeans.put(cacheKey, Boolean.TRUE);
-		// 将增强加入到代理类中
+        // 将增强加入到代理类中
         Object proxy = createProxy(
                 bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
         this.proxyTypes.put(cacheKey, proxy.getClass());
@@ -134,7 +134,7 @@ getAdvicesAndAdvisorsForBean 获取bean对应的增强
 // AbstractAdvisorAutoProxyCreator.class 75
 protected Object[] getAdvicesAndAdvisorsForBean(
         Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
-	// 获取这个bean的增强列表
+    // 获取这个bean的增强列表
     List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
     if (advisors.isEmpty()) {
         return DO_NOT_PROXY;
@@ -145,10 +145,10 @@ protected Object[] getAdvicesAndAdvisorsForBean(
 // AbstractAdvisorAutoProxyCreator.class 95
 protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
     // 获取候选的增强列表
-	List<Advisor> candidateAdvisors = findCandidateAdvisors();
-	// 从候选增强列表挑选出当前bean可以使用的
+    List<Advisor> candidateAdvisors = findCandidateAdvisors();
+    // 从候选增强列表挑选出当前bean可以使用的
     List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
-	// 钩子方法，留给子类使用。
+    // 钩子方法，留给子类使用。
     extendAdvisors(eligibleAdvisors);
     if (!eligibleAdvisors.isEmpty()) {
         eligibleAdvisors = sortAdvisors(eligibleAdvisors);
@@ -170,61 +170,61 @@ protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName
 ```java
 // AbstractAdvisorAutoProxyCreator.class 109
 protected List<Advisor> findCandidateAdvisors() {
-	Assert.state(this.advisorRetrievalHelper != null, "No BeanFactoryAdvisorRetrievalHelper available");
-	// 获取增强列表。增强也是以bean的方式被Spring管理
-	return this.advisorRetrievalHelper.findAdvisorBeans();
+    Assert.state(this.advisorRetrievalHelper != null, "No BeanFactoryAdvisorRetrievalHelper available");
+    // 获取增强列表。增强也是以bean的方式被Spring管理
+    return this.advisorRetrievalHelper.findAdvisorBeans();
 }
 
 // BeanFactoryAdvisorRetrievalHelper.class 67
 public List<Advisor> findAdvisorBeans() {
-	String[] advisorNames = this.cachedAdvisorBeanNames;
-	// 如果增强的beanName列表是空的，那就进行初始化
-	if (advisorNames == null) {
-		// 获取当前beanFactory中的属于增强类的beanName。并且允许获取singleton类型之外的bean。
-		advisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
-				this.beanFactory, Advisor.class, true, false);
-		this.cachedAdvisorBeanNames = advisorNames;
-	}
-	if (advisorNames.length == 0) {
-		return new ArrayList<>();
-	}
+    String[] advisorNames = this.cachedAdvisorBeanNames;
+    // 如果增强的beanName列表是空的，那就进行初始化
+    if (advisorNames == null) {
+        // 获取当前beanFactory中的属于增强类的beanName。并且允许获取singleton类型之外的bean。
+        advisorNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
+                this.beanFactory, Advisor.class, true, false);
+        this.cachedAdvisorBeanNames = advisorNames;
+    }
+    if (advisorNames.length == 0) {
+        return new ArrayList<>();
+    }
 
-	List<Advisor> advisors = new ArrayList<>();
-	// 遍历增强beanName列表
-	for (String name : advisorNames) {
-		if (isEligibleBean(name)) {
-			// beanName正在创建中则跳过
-			if (this.beanFactory.isCurrentlyInCreation(name)) {
-				if (logger.isTraceEnabled()) {
-					logger.trace("Skipping currently created advisor '" + name + "'");
-				}
-			}
-			else {
-				try {
-					// 初始化beanName
-					advisors.add(this.beanFactory.getBean(name, Advisor.class));
-				}
-				catch (BeanCreationException ex) {
-					Throwable rootCause = ex.getMostSpecificCause();
-					if (rootCause instanceof BeanCurrentlyInCreationException) {
-						BeanCreationException bce = (BeanCreationException) rootCause;
-						String bceBeanName = bce.getBeanName();
-						if (bceBeanName != null && this.beanFactory.isCurrentlyInCreation(bceBeanName)) {
-							if (logger.isTraceEnabled()) {
-								logger.trace("Skipping advisor '" + name +
-										"' with dependency on currently created bean: " + ex.getMessage());
-							}
-							// Ignore: indicates a reference back to the bean we're trying to advise.
-							// We want to find advisors other than the currently created bean itself.
-							continue;
-						}
-					}
-					throw ex;
-				}
-			}
-		}
-	}
-	return advisors;
+    List<Advisor> advisors = new ArrayList<>();
+    // 遍历增强beanName列表
+    for (String name : advisorNames) {
+        if (isEligibleBean(name)) {
+            // beanName正在创建中则跳过
+            if (this.beanFactory.isCurrentlyInCreation(name)) {
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Skipping currently created advisor '" + name + "'");
+                }
+            }
+            else {
+                try {
+                    // 初始化beanName
+                    advisors.add(this.beanFactory.getBean(name, Advisor.class));
+                }
+                catch (BeanCreationException ex) {
+                    Throwable rootCause = ex.getMostSpecificCause();
+                    if (rootCause instanceof BeanCurrentlyInCreationException) {
+                        BeanCreationException bce = (BeanCreationException) rootCause;
+                        String bceBeanName = bce.getBeanName();
+                        if (bceBeanName != null && this.beanFactory.isCurrentlyInCreation(bceBeanName)) {
+                            if (logger.isTraceEnabled()) {
+                                logger.trace("Skipping advisor '" + name +
+                                        "' with dependency on currently created bean: " + ex.getMessage());
+                            }
+                            // Ignore: indicates a reference back to the bean we're trying to advise.
+                            // We want to find advisors other than the currently created bean itself.
+                            continue;
+                        }
+                    }
+                    throw ex;
+                }
+            }
+        }
+    }
+    return advisors;
 }
 ```
 
@@ -240,10 +240,10 @@ public List<Advisor> findAdvisorBeans() {
 // AbstractAdvisorAutoProxyCreator.class 95
 protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
     // 获取候选的增强列表
-	List<Advisor> candidateAdvisors = findCandidateAdvisors();
-	// 从候选增强列表挑选出当前bean可以使用的
+    List<Advisor> candidateAdvisors = findCandidateAdvisors();
+    // 从候选增强列表挑选出当前bean可以使用的
     List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
-	// 钩子方法，留给子类使用。
+    // 钩子方法，留给子类使用。
     extendAdvisors(eligibleAdvisors);
     if (!eligibleAdvisors.isEmpty()) {
         eligibleAdvisors = sortAdvisors(eligibleAdvisors);
@@ -255,44 +255,44 @@ protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName
 ```java
 // AbstractAdvisorAutoProxyCreator.class 109
 protected List<Advisor> findAdvisorsThatCanApply(
-		List<Advisor> candidateAdvisors, Class<?> beanClass, String beanName) {
-	// 将beanName标记为正在进行代理
-	ProxyCreationContext.setCurrentProxiedBeanName(beanName);
-	try {
-		// 返回当前bean可用的增强
-		return AopUtils.findAdvisorsThatCanApply(candidateAdvisors, beanClass);
-	}
-	finally {
-		// 取消标记
-		ProxyCreationContext.setCurrentProxiedBeanName(null);
-	}
+        List<Advisor> candidateAdvisors, Class<?> beanClass, String beanName) {
+    // 将beanName标记为正在进行代理
+    ProxyCreationContext.setCurrentProxiedBeanName(beanName);
+    try {
+        // 返回当前bean可用的增强
+        return AopUtils.findAdvisorsThatCanApply(candidateAdvisors, beanClass);
+    }
+    finally {
+        // 取消标记
+        ProxyCreationContext.setCurrentProxiedBeanName(null);
+    }
 }
 
 // AopUtils.class 305
 public static List<Advisor> findAdvisorsThatCanApply(List<Advisor> candidateAdvisors, Class<?> clazz) {
-	if (candidateAdvisors.isEmpty()) {
-		return candidateAdvisors;
-	}
-	List<Advisor> eligibleAdvisors = new ArrayList<>();
-	for (Advisor candidate : candidateAdvisors) {
-		// IntroductionAdvisor 不太清楚，我们常用的是PointcutAdvisor，在下面应用
-		if (candidate instanceof IntroductionAdvisor && canApply(candidate, clazz)) {
-			eligibleAdvisors.add(candidate);
-		}
-	}
-	boolean hasIntroductions = !eligibleAdvisors.isEmpty();
+    if (candidateAdvisors.isEmpty()) {
+        return candidateAdvisors;
+    }
+    List<Advisor> eligibleAdvisors = new ArrayList<>();
+    for (Advisor candidate : candidateAdvisors) {
+        // IntroductionAdvisor 不太清楚，我们常用的是PointcutAdvisor，在下面应用
+        if (candidate instanceof IntroductionAdvisor && canApply(candidate, clazz)) {
+            eligibleAdvisors.add(candidate);
+        }
+    }
+    boolean hasIntroductions = !eligibleAdvisors.isEmpty();
     // 遍历所有增强，如果某个增强可以应用clazz的任何一个方法则将该增强加入到eligibleAdvisors中。
-	for (Advisor candidate : candidateAdvisors) {
-		if (candidate instanceof IntroductionAdvisor) {
-			// already processed
-			continue;
-		}
-		// PointcutAdvisor 在这里被应用
-		if (canApply(candidate, clazz, hasIntroductions)) {
-			eligibleAdvisors.add(candidate);
-		}
-	}
-	return eligibleAdvisors;
+    for (Advisor candidate : candidateAdvisors) {
+        if (candidate instanceof IntroductionAdvisor) {
+            // already processed
+            continue;
+        }
+        // PointcutAdvisor 在这里被应用
+        if (canApply(candidate, clazz, hasIntroductions)) {
+            eligibleAdvisors.add(candidate);
+        }
+    }
+    return eligibleAdvisors;
 }
 ```
 
@@ -304,60 +304,60 @@ PointcutAdvisor切点的粒度是方法，它是在某一个方法执行的前�
 ```java
 // AopUtils.class 283
 public static boolean canApply(Advisor advisor, Class<?> targetClass, boolean hasIntroductions) {
-	if (advisor instanceof IntroductionAdvisor) {
-		return ((IntroductionAdvisor) advisor).getClassFilter().matches(targetClass);
-	}
-	// 常用的是这个
-	else if (advisor instanceof PointcutAdvisor) {
-		PointcutAdvisor pca = (PointcutAdvisor) advisor;
-		return canApply(pca.getPointcut(), targetClass, hasIntroductions);
-	}
-	else {
-		// It doesn't have a pointcut so we assume it applies.
-		return true;
-	}
+    if (advisor instanceof IntroductionAdvisor) {
+        return ((IntroductionAdvisor) advisor).getClassFilter().matches(targetClass);
+    }
+    // 常用的是这个
+    else if (advisor instanceof PointcutAdvisor) {
+        PointcutAdvisor pca = (PointcutAdvisor) advisor;
+        return canApply(pca.getPointcut(), targetClass, hasIntroductions);
+    }
+    else {
+        // It doesn't have a pointcut so we assume it applies.
+        return true;
+    }
 }
 
 // AopUtils.class 224
 public static boolean canApply(Pointcut pc, Class<?> targetClass, boolean hasIntroductions) {
-	Assert.notNull(pc, "Pointcut must not be null");
-	// 
-	if (!pc.getClassFilter().matches(targetClass)) {
-		return false;
-	}
-	
-	// 获取方法匹配器，看看这个切点可以匹配上这个类的某一个方法吗？可以匹配上任何一个就需要对这个类进行代理。
-	MethodMatcher methodMatcher = pc.getMethodMatcher();
-	if (methodMatcher == MethodMatcher.TRUE) {
-		// No need to iterate the methods if we're matching any method anyway...
-		return true;
-	}
+    Assert.notNull(pc, "Pointcut must not be null");
+    // 
+    if (!pc.getClassFilter().matches(targetClass)) {
+        return false;
+    }
+    
+    // 获取方法匹配器，看看这个切点可以匹配上这个类的某一个方法吗？可以匹配上任何一个就需要对这个类进行代理。
+    MethodMatcher methodMatcher = pc.getMethodMatcher();
+    if (methodMatcher == MethodMatcher.TRUE) {
+        // No need to iterate the methods if we're matching any method anyway...
+        return true;
+    }
 
-	IntroductionAwareMethodMatcher introductionAwareMethodMatcher = null;
-	if (methodMatcher instanceof IntroductionAwareMethodMatcher) {
-		introductionAwareMethodMatcher = (IntroductionAwareMethodMatcher) methodMatcher;
-	}
+    IntroductionAwareMethodMatcher introductionAwareMethodMatcher = null;
+    if (methodMatcher instanceof IntroductionAwareMethodMatcher) {
+        introductionAwareMethodMatcher = (IntroductionAwareMethodMatcher) methodMatcher;
+    }
 
-	Set<Class<?>> classes = new LinkedHashSet<>();
-	if (!Proxy.isProxyClass(targetClass)) {
-		classes.add(ClassUtils.getUserClass(targetClass));
-	}
-	// 获取这个类实现的所有接口
-	classes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
+    Set<Class<?>> classes = new LinkedHashSet<>();
+    if (!Proxy.isProxyClass(targetClass)) {
+        classes.add(ClassUtils.getUserClass(targetClass));
+    }
+    // 获取这个类实现的所有接口
+    classes.addAll(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
 
-	// 如果这个切点可以匹配这个类中的任何一个方法则返回true，否则返回false。
-	for (Class<?> clazz : classes) {
-		Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
-		for (Method method : methods) {
-			if (introductionAwareMethodMatcher != null ?
-					introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
-					methodMatcher.matches(method, targetClass)) {
-				return true;
-			}
-		}
-	}
+    // 如果这个切点可以匹配这个类中的任何一个方法则返回true，否则返回false。
+    for (Class<?> clazz : classes) {
+        Method[] methods = ReflectionUtils.getAllDeclaredMethods(clazz);
+        for (Method method : methods) {
+            if (introductionAwareMethodMatcher != null ?
+                    introductionAwareMethodMatcher.matches(method, targetClass, hasIntroductions) :
+                    methodMatcher.matches(method, targetClass)) {
+                return true;
+            }
+        }
+    }
 
-	return false;
+    return false;
 }
 ```
 
@@ -383,11 +383,11 @@ protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) 
     if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
         return bean;
     }
-	// 这个bean不需要增强就直接返回
+    // 这个bean不需要增强就直接返回
     if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
         return bean;
     }
-	// 如果bean是一个增强、切点等等则不会被代理。第二种情况是IOC的一个特性，以.ORIGINAL作为class路径结尾的也不会被代理。
+    // 如果bean是一个增强、切点等等则不会被代理。第二种情况是IOC的一个特性，以.ORIGINAL作为class路径结尾的也不会被代理。
     if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
         this.advisedBeans.put(cacheKey, Boolean.FALSE);
         return bean;
@@ -396,9 +396,9 @@ protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) 
     // 获取这个类的增强
     Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
     if (specificInterceptors != DO_NOT_PROXY) {
-		// 将bean的代理标记设置为true
+        // 将bean的代理标记设置为true
         this.advisedBeans.put(cacheKey, Boolean.TRUE);
-		// 将增强加入到代理类中
+        // 将增强加入到代理类中
         Object proxy = createProxy(
                 bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
         this.proxyTypes.put(cacheKey, proxy.getClass());
@@ -413,43 +413,43 @@ protected Object wrapIfNecessary(Object bean, String beanName, Object cacheKey) 
 ```java
 // AbstractAutoProxyCreator.class 433
 protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
-							 @Nullable Object[] specificInterceptors, TargetSource targetSource) {
+                             @Nullable Object[] specificInterceptors, TargetSource targetSource) {
 
-	if (this.beanFactory instanceof ConfigurableListableBeanFactory) {
-		AutoProxyUtils.exposeTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName, beanClass);
-	}
+    if (this.beanFactory instanceof ConfigurableListableBeanFactory) {
+        AutoProxyUtils.exposeTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName, beanClass);
+    }
 
-	ProxyFactory proxyFactory = new ProxyFactory();
-	proxyFactory.copyFrom(this);
+    ProxyFactory proxyFactory = new ProxyFactory();
+    proxyFactory.copyFrom(this);
 
-	if (!proxyFactory.isProxyTargetClass()) {
-		// proxy-target-class="true" 如果有这个配置表示要求用CGLIB生成代理
-		if (shouldProxyTargetClass(beanClass, beanName)) {
-			proxyFactory.setProxyTargetClass(true);
-		}
-		else {
-			// beanClass有接口的话把接口都添加到proxyFactory中；没有接口就setProxyTargetClass(true)，表示使用CGLIB
-			evaluateProxyInterfaces(beanClass, proxyFactory);
-		}
-	}
-	// 将入参的增强和公共的增强包装成Advisor数组，并返回
-	Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
-	proxyFactory.addAdvisors(advisors);
-	proxyFactory.setTargetSource(targetSource);
-	customizeProxyFactory(proxyFactory);
+    if (!proxyFactory.isProxyTargetClass()) {
+        // proxy-target-class="true" 如果有这个配置表示要求用CGLIB生成代理
+        if (shouldProxyTargetClass(beanClass, beanName)) {
+            proxyFactory.setProxyTargetClass(true);
+        }
+        else {
+            // beanClass有接口的话把接口都添加到proxyFactory中；没有接口就setProxyTargetClass(true)，表示使用CGLIB
+            evaluateProxyInterfaces(beanClass, proxyFactory);
+        }
+    }
+    // 将入参的增强和公共的增强包装成Advisor数组，并返回
+    Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
+    proxyFactory.addAdvisors(advisors);
+    proxyFactory.setTargetSource(targetSource);
+    customizeProxyFactory(proxyFactory);
 
-	proxyFactory.setFrozen(this.freezeProxy);
-	if (advisorsPreFiltered()) {
-		proxyFactory.setPreFiltered(true);
-	}
+    proxyFactory.setFrozen(this.freezeProxy);
+    if (advisorsPreFiltered()) {
+        proxyFactory.setPreFiltered(true);
+    }
 
-	// Use original ClassLoader if bean class not locally loaded in overriding class loader
-	ClassLoader classLoader = getProxyClassLoader();
-	if (classLoader instanceof SmartClassLoader && classLoader != beanClass.getClassLoader()) {
-		classLoader = ((SmartClassLoader) classLoader).getOriginalClassLoader();
-	}
-	// 代理
-	return proxyFactory.getProxy(classLoader);
+    // Use original ClassLoader if bean class not locally loaded in overriding class loader
+    ClassLoader classLoader = getProxyClassLoader();
+    if (classLoader instanceof SmartClassLoader && classLoader != beanClass.getClassLoader()) {
+        classLoader = ((SmartClassLoader) classLoader).getOriginalClassLoader();
+    }
+    // 代理
+    return proxyFactory.getProxy(classLoader);
 }
 ```
 
@@ -461,38 +461,38 @@ protected Object createProxy(Class<?> beanClass, @Nullable String beanName,
 ```java
 // ProxyFactory.class 109
 public Object getProxy(@Nullable ClassLoader classLoader) {
-	return createAopProxy().getProxy(classLoader);
+    return createAopProxy().getProxy(classLoader);
 }
 
 // ProxyCreatorSupport.class 101
 protected final synchronized AopProxy createAopProxy() {
-	if (!this.active) {
-		activate();
-	}
+    if (!this.active) {
+        activate();
+    }
     // 创建AOP代理类
-	return getAopProxyFactory().createAopProxy(this);
+    return getAopProxyFactory().createAopProxy(this);
 }
 
 // DefaultAopProxyFactory.class 53
 @Override
 public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
     // 第一个参数不清楚，后面的参数是这些意思：是否要对代理进行优化 || proxy-target-class=true(使用CGLIB) || 代理对象没接口
-	if (!NativeDetector.inNativeImage() &&
-			(config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config))) {
-		Class<?> targetClass = config.getTargetClass();
-		if (targetClass == null) {
-			throw new AopConfigException("TargetSource cannot determine target class: " +
-					"Either an interface or a target is required for proxy creation.");
-		}
+    if (!NativeDetector.inNativeImage() &&
+            (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config))) {
+        Class<?> targetClass = config.getTargetClass();
+        if (targetClass == null) {
+            throw new AopConfigException("TargetSource cannot determine target class: " +
+                    "Either an interface or a target is required for proxy creation.");
+        }
         // 代理对象就是接口
-		if (targetClass.isInterface() || Proxy.isProxyClass(targetClass)) {
-			return new JdkDynamicAopProxy(config);
-		}
-		return new ObjenesisCglibAopProxy(config);
-	}
-	else {
-		return new JdkDynamicAopProxy(config);
-	}
+        if (targetClass.isInterface() || Proxy.isProxyClass(targetClass)) {
+            return new JdkDynamicAopProxy(config);
+        }
+        return new ObjenesisCglibAopProxy(config);
+    }
+    else {
+        return new JdkDynamicAopProxy(config);
+    }
 }
 ```
 
@@ -506,11 +506,11 @@ public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException 
 // JdkDynamicAopProxy.class 122
 @Override
 public Object getProxy(@Nullable ClassLoader classLoader) {
-	if (logger.isTraceEnabled()) {
-		logger.trace("Creating JDK dynamic proxy: " + this.advised.getTargetSource());
-	}
-	// 通过构造对象生成一个代理对象，入参this就是InvocationHandler，它具体实现了invoke方法
-	return Proxy.newProxyInstance(classLoader, this.proxiedInterfaces, this);
+    if (logger.isTraceEnabled()) {
+        logger.trace("Creating JDK dynamic proxy: " + this.advised.getTargetSource());
+    }
+    // 通过构造对象生成一个代理对象，入参this就是InvocationHandler，它具体实现了invoke方法
+    return Proxy.newProxyInstance(classLoader, this.proxiedInterfaces, this);
 }
 ```
 
@@ -519,75 +519,75 @@ public Object getProxy(@Nullable ClassLoader classLoader) {
 ```java
 // JdkDynamicAopProxy.class 159
 public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-	Object oldProxy = null;
-	boolean setProxyContext = false;
+    Object oldProxy = null;
+    boolean setProxyContext = false;
 
-	TargetSource targetSource = this.advised.targetSource;
-	Object target = null;
+    TargetSource targetSource = this.advised.targetSource;
+    Object target = null;
 
-	try {
-		// 如果当前调用的方法是equals或者hashCode且这两个方法没有被代理，则直接调用。 另外两个分支不清楚
-		if (!this.equalsDefined && AopUtils.isEqualsMethod(method)) {...}
-		else if (!this.hashCodeDefined && AopUtils.isHashCodeMethod(method)) {...}
-		else if (method.getDeclaringClass() == DecoratingProxy.class) {....}
-		else if (!this.advised.opaque && method.getDeclaringClass().isInterface() &&
-				method.getDeclaringClass().isAssignableFrom(Advised.class)) {...}
+    try {
+        // 如果当前调用的方法是equals或者hashCode且这两个方法没有被代理，则直接调用。 另外两个分支不清楚
+        if (!this.equalsDefined && AopUtils.isEqualsMethod(method)) {...}
+        else if (!this.hashCodeDefined && AopUtils.isHashCodeMethod(method)) {...}
+        else if (method.getDeclaringClass() == DecoratingProxy.class) {....}
+        else if (!this.advised.opaque && method.getDeclaringClass().isInterface() &&
+                method.getDeclaringClass().isAssignableFrom(Advised.class)) {...}
 
-		Object retVal;
-		
-		// 通过线程本地变量解决代理类内部方法自调用问题。@EnableAspectJAutoProxy(exposeProxy = true)
-		// 详情见文章最后的学习文章列表
-		if (this.advised.exposeProxy) {
-			oldProxy = AopContext.setCurrentProxy(proxy);
-			setProxyContext = true;
-		}
+        Object retVal;
+        
+        // 通过线程本地变量解决代理类内部方法自调用问题。@EnableAspectJAutoProxy(exposeProxy = true)
+        // 详情见文章最后的学习文章列表
+        if (this.advised.exposeProxy) {
+            oldProxy = AopContext.setCurrentProxy(proxy);
+            setProxyContext = true;
+        }
 
 
-		target = targetSource.getTarget();
-		Class<?> targetClass = (target != null ? target.getClass() : null);
+        target = targetSource.getTarget();
+        Class<?> targetClass = (target != null ? target.getClass() : null);
 
-		// 获取这个方法的增强列表。
-		List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
+        // 获取这个方法的增强列表。
+        List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
 
-		// 如果增强列表为空，说明不需要增强，那我们不创建MethodInvocation，直接调用目标方法。
-		if (chain.isEmpty()) {
-			Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);
-			retVal = AopUtils.invokeJoinpointUsingReflection(target, method, argsToUse);
-		}
-		else {
-			// 创建一个MethodInvocation，它的构造方法只做了一些属性的赋值
-			MethodInvocation invocation =
-					new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);
-			// 调用目标方法，肯定是先执行前置的方法，然后执行目标方法，接着执行后置方法。
-			retVal = invocation.proceed();
-		}
+        // 如果增强列表为空，说明不需要增强，那我们不创建MethodInvocation，直接调用目标方法。
+        if (chain.isEmpty()) {
+            Object[] argsToUse = AopProxyUtils.adaptArgumentsIfNecessary(method, args);
+            retVal = AopUtils.invokeJoinpointUsingReflection(target, method, argsToUse);
+        }
+        else {
+            // 创建一个MethodInvocation，它的构造方法只做了一些属性的赋值
+            MethodInvocation invocation =
+                    new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);
+            // 调用目标方法，肯定是先执行前置的方法，然后执行目标方法，接着执行后置方法。
+            retVal = invocation.proceed();
+        }
 
-		// Massage return value if necessary.
-		Class<?> returnType = method.getReturnType();
-		if (retVal != null && retVal == target &&
-				returnType != Object.class && returnType.isInstance(proxy) &&
-				!RawTargetAccess.class.isAssignableFrom(method.getDeclaringClass())) {
-			// Special case: it returned "this" and the return type of the method
-			// is type-compatible. Note that we can't help if the target sets
-			// a reference to itself in another returned object.
-			retVal = proxy;
-		}
-		else if (retVal == null && returnType != Void.TYPE && returnType.isPrimitive()) {
-			throw new AopInvocationException(
-					"Null return value from advice does not match primitive return type for: " + method);
-		}
-		return retVal;
-	}
-	finally {
-		if (target != null && !targetSource.isStatic()) {
-			// Must have come from TargetSource.
-			targetSource.releaseTarget(target);
-		}
-		if (setProxyContext) {
-			// Restore old proxy.
-			AopContext.setCurrentProxy(oldProxy);
-		}
-	}
+        // Massage return value if necessary.
+        Class<?> returnType = method.getReturnType();
+        if (retVal != null && retVal == target &&
+                returnType != Object.class && returnType.isInstance(proxy) &&
+                !RawTargetAccess.class.isAssignableFrom(method.getDeclaringClass())) {
+            // Special case: it returned "this" and the return type of the method
+            // is type-compatible. Note that we can't help if the target sets
+            // a reference to itself in another returned object.
+            retVal = proxy;
+        }
+        else if (retVal == null && returnType != Void.TYPE && returnType.isPrimitive()) {
+            throw new AopInvocationException(
+                    "Null return value from advice does not match primitive return type for: " + method);
+        }
+        return retVal;
+    }
+    finally {
+        if (target != null && !targetSource.isStatic()) {
+            // Must have come from TargetSource.
+            targetSource.releaseTarget(target);
+        }
+        if (setProxyContext) {
+            // Restore old proxy.
+            AopContext.setCurrentProxy(oldProxy);
+        }
+    }
 }
 ```
 
@@ -596,80 +596,80 @@ public Object invoke(Object proxy, Method method, Object[] args) throws Throwabl
 ```java
 // AdvisedSupport.class 466
 public List<Object> getInterceptorsAndDynamicInterceptionAdvice(Method method, @Nullable Class<?> targetClass) {
-	AdvisedSupport.MethodCacheKey cacheKey = new AdvisedSupport.MethodCacheKey(method);
-	// 从缓存中获取当前方法对应的增强
-	List<Object> cached = this.methodCache.get(cacheKey);
-	//	缓存中没有拿到，则先生成然后放缓存里
-	if (cached == null) {
-		cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(
-				this, method, targetClass);
-		this.methodCache.put(cacheKey, cached);
-	}
-	return cached;
+    AdvisedSupport.MethodCacheKey cacheKey = new AdvisedSupport.MethodCacheKey(method);
+    // 从缓存中获取当前方法对应的增强
+    List<Object> cached = this.methodCache.get(cacheKey);
+    //    缓存中没有拿到，则先生成然后放缓存里
+    if (cached == null) {
+        cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(
+                this, method, targetClass);
+        this.methodCache.put(cacheKey, cached);
+    }
+    return cached;
 }
 
 // DefaultAdvisorChainFactory.class 51
 public List<Object> getInterceptorsAndDynamicInterceptionAdvice(
-		 Advised config, Method method, @Nullable Class<?> targetClass) {
+         Advised config, Method method, @Nullable Class<?> targetClass) {
 
-	 AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
-	 // 获取当前类匹配的增强，我们要从其中挑选出当前方法可以用的增强。
-	 Advisor[] advisors = config.getAdvisors();
-	 List<Object> interceptorList = new ArrayList<>(advisors.length);
-	 Class<?> actualClass = (targetClass != null ? targetClass : method.getDeclaringClass());
-	 Boolean hasIntroductions = null;
-	
-	// 遍历所有增强，校验是否可以应用当前方法
-	 for (Advisor advisor : advisors) {
-	 	// 最常用的就是Pointcut增强，它是针对方法的增强
-		 if (advisor instanceof PointcutAdvisor) {
-			 // Add it conditionally.
-			 PointcutAdvisor pointcutAdvisor = (PointcutAdvisor) advisor;
-			 // 是否经历过预处理（默认false），如果没经历过那么现在进行匹配操作。判断增强是否可以作用于当前类
-			 if (config.isPreFiltered() || pointcutAdvisor.getPointcut().getClassFilter().matches(actualClass)) {
-				 MethodMatcher mm = pointcutAdvisor.getPointcut().getMethodMatcher();
-				 boolean match;
-				 if (mm instanceof IntroductionAwareMethodMatcher) {
-					 if (hasIntroductions == null) {
-						 hasIntroductions = hasMatchingIntroductions(advisors, actualClass);
-					 }
-					 match = ((IntroductionAwareMethodMatcher) mm).matches(method, actualClass, hasIntroductions);
-				 }
-				 else {
-				 	// 判断增强是否可以作用于当前方法
-					 match = mm.matches(method, actualClass);
-				 }
-				 // 匹配成功
-				 if (match) {
-				 	// 将增强转化为MethodInterceptor方法拦截器
-					 MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
-					 if (mm.isRuntime()) {
-						 for (MethodInterceptor interceptor : interceptors) {
-							 interceptorList.add(new InterceptorAndDynamicMethodMatcher(interceptor, mm));
-						 }
-					 }
-					 else {
-					 	// 添加到返回参数中
-						 interceptorList.addAll(Arrays.asList(interceptors));
-					 }
-				 }
-			 }
-		 }
-		 else if (advisor instanceof IntroductionAdvisor) {
-			 IntroductionAdvisor ia = (IntroductionAdvisor) advisor;
-			 // IntroductionAdvisor的切点是类，只要类匹配成功就可以了
-			 if (config.isPreFiltered() || ia.getClassFilter().matches(actualClass)) {
-				 Interceptor[] interceptors = registry.getInterceptors(advisor);
-				 interceptorList.addAll(Arrays.asList(interceptors));
-			 }
-		 }
-		 else {
-			 Interceptor[] interceptors = registry.getInterceptors(advisor);
-			 interceptorList.addAll(Arrays.asList(interceptors));
-		 }
-	 }
+     AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
+     // 获取当前类匹配的增强，我们要从其中挑选出当前方法可以用的增强。
+     Advisor[] advisors = config.getAdvisors();
+     List<Object> interceptorList = new ArrayList<>(advisors.length);
+     Class<?> actualClass = (targetClass != null ? targetClass : method.getDeclaringClass());
+     Boolean hasIntroductions = null;
+    
+    // 遍历所有增强，校验是否可以应用当前方法
+     for (Advisor advisor : advisors) {
+         // 最常用的就是Pointcut增强，它是针对方法的增强
+         if (advisor instanceof PointcutAdvisor) {
+             // Add it conditionally.
+             PointcutAdvisor pointcutAdvisor = (PointcutAdvisor) advisor;
+             // 是否经历过预处理（默认false），如果没经历过那么现在进行匹配操作。判断增强是否可以作用于当前类
+             if (config.isPreFiltered() || pointcutAdvisor.getPointcut().getClassFilter().matches(actualClass)) {
+                 MethodMatcher mm = pointcutAdvisor.getPointcut().getMethodMatcher();
+                 boolean match;
+                 if (mm instanceof IntroductionAwareMethodMatcher) {
+                     if (hasIntroductions == null) {
+                         hasIntroductions = hasMatchingIntroductions(advisors, actualClass);
+                     }
+                     match = ((IntroductionAwareMethodMatcher) mm).matches(method, actualClass, hasIntroductions);
+                 }
+                 else {
+                     // 判断增强是否可以作用于当前方法
+                     match = mm.matches(method, actualClass);
+                 }
+                 // 匹配成功
+                 if (match) {
+                     // 将增强转化为MethodInterceptor方法拦截器
+                     MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
+                     if (mm.isRuntime()) {
+                         for (MethodInterceptor interceptor : interceptors) {
+                             interceptorList.add(new InterceptorAndDynamicMethodMatcher(interceptor, mm));
+                         }
+                     }
+                     else {
+                         // 添加到返回参数中
+                         interceptorList.addAll(Arrays.asList(interceptors));
+                     }
+                 }
+             }
+         }
+         else if (advisor instanceof IntroductionAdvisor) {
+             IntroductionAdvisor ia = (IntroductionAdvisor) advisor;
+             // IntroductionAdvisor的切点是类，只要类匹配成功就可以了
+             if (config.isPreFiltered() || ia.getClassFilter().matches(actualClass)) {
+                 Interceptor[] interceptors = registry.getInterceptors(advisor);
+                 interceptorList.addAll(Arrays.asList(interceptors));
+             }
+         }
+         else {
+             Interceptor[] interceptors = registry.getInterceptors(advisor);
+             interceptorList.addAll(Arrays.asList(interceptors));
+         }
+     }
 
-	 return interceptorList;
+     return interceptorList;
  }
 ```
 
@@ -679,31 +679,31 @@ public List<Object> getInterceptorsAndDynamicInterceptionAdvice(
 ```java
 // ReflectiveMethodInvocation.class 160
 public Object proceed() throws Throwable {
-	// currentInterceptorIndex从-1开始，到size()-2结束，因此到size()-1就可以调用被代理的方法了。
-	if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
-		return invokeJoinpoint();
-	}
-	// 获取拦截器
-	Object interceptorOrInterceptionAdvice =
-			this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
-	if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) {
+    // currentInterceptorIndex从-1开始，到size()-2结束，因此到size()-1就可以调用被代理的方法了。
+    if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
+        return invokeJoinpoint();
+    }
+    // 获取拦截器
+    Object interceptorOrInterceptionAdvice =
+            this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
+    if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) {
 
-		InterceptorAndDynamicMethodMatcher dm =
-				(InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;
-		Class<?> targetClass = (this.targetClass != null ? this.targetClass : this.method.getDeclaringClass());
-		if (dm.methodMatcher.matches(this.method, targetClass, this.arguments)) {
-			return dm.interceptor.invoke(this);
-		}
-		else {
-			// Dynamic matching failed.
-			// Skip this interceptor and invoke the next in the chain.
-			return proceed();
-		}
-	}
-	else {
-		// 使用递归的方式去调用拦截器
-		return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);
-	}
+        InterceptorAndDynamicMethodMatcher dm =
+                (InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;
+        Class<?> targetClass = (this.targetClass != null ? this.targetClass : this.method.getDeclaringClass());
+        if (dm.methodMatcher.matches(this.method, targetClass, this.arguments)) {
+            return dm.interceptor.invoke(this);
+        }
+        else {
+            // Dynamic matching failed.
+            // Skip this interceptor and invoke the next in the chain.
+            return proceed();
+        }
+    }
+    else {
+        // 使用递归的方式去调用拦截器
+        return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);
+    }
 }
 ```
 
@@ -713,39 +713,39 @@ public Object proceed() throws Throwable {
 // 前置增强
 public class MethodBeforeAdviceInterceptor implements MethodInterceptor, BeforeAdvice, Serializable {
 
-	private final MethodBeforeAdvice advice;
+    private final MethodBeforeAdvice advice;
 
-	public MethodBeforeAdviceInterceptor(MethodBeforeAdvice advice) {
-		Assert.notNull(advice, "Advice must not be null");
-		this.advice = advice;
-	}
+    public MethodBeforeAdviceInterceptor(MethodBeforeAdvice advice) {
+        Assert.notNull(advice, "Advice must not be null");
+        this.advice = advice;
+    }
 
-	@Override
-	@Nullable
-	public Object invoke(MethodInvocation mi) throws Throwable {
-		this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());
-		return mi.proceed();
-	}
+    @Override
+    @Nullable
+    public Object invoke(MethodInvocation mi) throws Throwable {
+        this.advice.before(mi.getMethod(), mi.getArguments(), mi.getThis());
+        return mi.proceed();
+    }
 
 }
 
 // 后置增强
 public class AfterReturningAdviceInterceptor implements MethodInterceptor, AfterAdvice, Serializable {
 
-	private final AfterReturningAdvice advice;
+    private final AfterReturningAdvice advice;
 
-	public AfterReturningAdviceInterceptor(AfterReturningAdvice advice) {
-		Assert.notNull(advice, "Advice must not be null");
-		this.advice = advice;
-	}
+    public AfterReturningAdviceInterceptor(AfterReturningAdvice advice) {
+        Assert.notNull(advice, "Advice must not be null");
+        this.advice = advice;
+    }
 
-	@Override
-	@Nullable
-	public Object invoke(MethodInvocation mi) throws Throwable {
-		Object retVal = mi.proceed();
-		this.advice.afterReturning(retVal, mi.getMethod(), mi.getArguments(), mi.getThis());
-		return retVal;
-	}
+    @Override
+    @Nullable
+    public Object invoke(MethodInvocation mi) throws Throwable {
+        Object retVal = mi.proceed();
+        this.advice.afterReturning(retVal, mi.getMethod(), mi.getArguments(), mi.getThis());
+        return retVal;
+    }
 
 }
 ```
