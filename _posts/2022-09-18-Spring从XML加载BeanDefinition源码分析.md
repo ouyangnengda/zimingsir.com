@@ -282,21 +282,21 @@ protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate d
 4. 那么先将Element解析成BeanDefinitionHolder
 5. 修饰BeanDefinitionHolder
 6. 将BeanDefinitionHolder注册到Spring。
-  
-  
+　　
+　　
 BeanDefinitionHolder和BeanDefinition有什么区别？
 > 包含关系。BeanDefinitionHolder包含一个BeanDefinition、beanName以及别名列表，这些数据后续都需要注册到Spring中。
 > 看下BeanDefinitionHolder类就很清楚了。
-  
-  
-那么将Element解析成BeanDefinitionHolder这个操作具体是怎么做的呢？333333
+　　
+　　
+那么将Element解析成BeanDefinitionHolder这个操作具体是怎么做的呢？４４４４
 * 解析id元素
 * 解析name元素
 * 通过id和name确定这个bean的唯一标识也就是:beanName
 * 解析其余的Attribute属性
 * 解析其余ChildNode属性。
-    
-
+　　
+　　
 Attribute属性和ChildNode有什么区别？
 ```xml
 <bean id="20162501" name="欧阳">
