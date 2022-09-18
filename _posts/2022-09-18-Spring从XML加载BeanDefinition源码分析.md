@@ -289,14 +289,14 @@ BeanDefinitionHolder和BeanDefinition有什么区别？
 > 看下BeanDefinitionHolder类就很清楚了。
   
   
-那么将Element解析成BeanDefinitionHolder这个操作具体是怎么做的呢？
+那么将Element解析成BeanDefinitionHolder这个操作具体是怎么做的呢？333333
 * 解析id元素
 * 解析name元素
 * 通过id和name确定这个bean的唯一标识也就是:beanName
 * 解析其余的Attribute属性
 * 解析其余ChildNode属性。
-  
-  
+    
+
 Attribute属性和ChildNode有什么区别？
 ```xml
 <bean id="20162501" name="欧阳">
