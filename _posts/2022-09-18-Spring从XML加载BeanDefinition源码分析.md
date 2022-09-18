@@ -240,7 +240,7 @@ private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate deleg
         processAliasRegistration(ele);
     }
     else if (delegate.nodeNameEquals(ele, BEAN_ELEMENT)) {
-        // 关心这个解析
+        // 关注这个解析
         processBeanDefinition(ele, delegate);
     }
     else if (delegate.nodeNameEquals(ele, NESTED_BEANS_ELEMENT)) {
