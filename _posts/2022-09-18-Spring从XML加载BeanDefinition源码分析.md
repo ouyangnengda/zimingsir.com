@@ -145,7 +145,7 @@ protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
 4. 将输入流转成Document
 5. 将Document加载到Spring
 
-接下来的步骤是：创建一个文档读取器，然后读取文档中的bean并注册，最后返回本次注册的bean数量
+接下来的步骤是：创建一个文档读取器，读取文档中的bean并注册，并返回本次注册的bean数量
 
 ```java
 // XmlBeanDefinitionReader.class 508
