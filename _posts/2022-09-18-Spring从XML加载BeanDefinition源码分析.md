@@ -8,6 +8,7 @@ category: spring
 本文分析Spring是如何将我们定义的Bean加载到Spring容器中。
 
 Spring的版本是 5.2.6.RELEASE
+
 Dubbo版本是 2.6.2
 
 本文是Spring IOC 初始化流程的一部分，回到初始化过程中的 refreshBeanFactory 方法。
