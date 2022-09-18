@@ -120,7 +120,8 @@ loadBeanDefinitions()加载BeanDefinition大致有两种实现。
 
 通过注解加载BeanDefinition：// 另一篇文章
 
-通过XML加载BeanDefinition：// 另一篇文章
+通过XML加载BeanDefinition：[Spring从XML加载BeanDefinition源码分析](https://zimingsir.com/spring/Spring从XML加载BeanDefinition源码分析.html)
+
 
 为了让当前文章的思路清晰，因此将上述两个加载流程的分析分别放到两篇文章。
 
