@@ -295,10 +295,12 @@ BeanDefinitionHolder和BeanDefinition有什么区别？
 * 解析其余ChildNode属性。
 
 Attribute属性和ChildNode有什么区别？
-> </bean id="20162501" name="欧阳">
->    </meta key="beanName" value="beanDefinition"/>
->    </qualifier value="a" type="java.lang.Integer"/>
-> </bean>
+```xml
+<bean id="20162501" name="欧阳">
+    <meta key="beanName" value="beanDefinition"/>
+    <qualifier value="a" type="java.lang.Integer"/>
+ </bean>
+```
 > 就拿这个bean标签举例，attribute就是标签内部的元素也就是id和name。
 > ChildNode子节点就是meta节点和qualifier节点，它是被bean包含的结点。
 
@@ -502,8 +504,9 @@ Spring是如何解析默认标签的呢？
 
 回到源码，假设现在正在解析这个标签
 
-</dubbo:registry address="www.baidu.com" timeout="10000" />
-
+```xml
+<dubbo:registry address="www.baidu.com" timeout="10000" />
+```
 首先获取标签的URI，然后通过URI获取到对应的NameSpaceHandler，接着调用parse方法。
 
 ```java
