@@ -299,7 +299,8 @@ Attribute属性和ChildNode有什么区别？
 >    /<meta key="beanName" value="beanDefinition"/>
 >    /<qualifier value="a" type="java.lang.Integer"/>
 > /</bean>
-> 就拿这个bean标签举例，attribute就是标签内部的元素也就是id和name。ChildNode子节点就是meta节点和qualifier节点，它是被bean包含的结点。
+> 就拿这个bean标签举例，attribute就是标签内部的元素也就是id和name。
+> ChildNode子节点就是meta节点和qualifier节点，它是被bean包含的结点。
 
 ```java
 // BeanDefinitionParserDelegate.class 404
@@ -347,7 +348,8 @@ public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable Be
 }
 ```
 
-是怎么装饰BeanDefinitionHolder的呢？
+怎么装饰BeanDefinitionHolder的呢？
+
 如果bean标签中包含用户自定义标签或者属性，那就需要在这里进行处理。
 上一个方法 parseBeanDefinitionElement 用于解析默认标签的基本设置。
 
@@ -467,6 +469,7 @@ public void registerBeanDefinition(String beanName, BeanDefinition beanDefinitio
 ```
 
 **阶段性总结**
+
 Spring是如何解析默认标签的呢？
 默认标签有四种import、alias、bean、beans，我们主要关注bean标签的解析。
 * 首先解析id和name属性，并生成对应的beanName
@@ -478,27 +481,24 @@ Spring是如何解析默认标签的呢？
 
 这是Spring扩展性的优秀实现。
 
-以Dubbo标签举例，每个包含Dubbo标签的XML文件头部你都能看到这样两行东西。
+问：以Dubbo标签举例，每个包含Dubbo标签的XML文件头部都必须有哪两样东西？
 
-xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
-xsi:schemaLocation=http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+> xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+> xsi:schemaLocation=http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+> xmlns其实是xmlNameSpace，也就是xml的命名空间，你需要加了这个东西才能在文件中使用dubbo相关的xml标签。
+> xsi:schemaLocation我理解是对你xml标签的限制。
+> 例如dubbo的protocol标签里面的属性，在这个文件里面都确定好了，你不能写额外的属性。
 
+问：上面是XML文件中的对dubbo标签的描述。那么即使我再XML文件中写了dubbo标签，这又该由谁来解析呢？毕竟Spring可是没有针对dubbo标签的解析器
 
-xmlns其实是xmlNameSpace，也就是xml的命名空间，就是你需要加了这个东西你才能在这个文件里面使用dubbo相关的xml标签。
-xsi:schemaLocation我理解是对你xml标签的限制。例如dubbo的protocol标签里面有哪些属性，在这个文件里面都确定好了，你不能写额外的属性。
+> DubboNamespaceHandler 这个类里面就定义了如何解析Dubbo的各种标签。
+> 它的init方法将标签名称和对应的解析器的关系注册到Spring。这样，在Spring解析xml文件的时候，发现标签的命名空间是用户自定义的，首先会通过命名空间URL获取到对应的命名空间解析器，然后再通过标签名获取到对应的标签解析器，然后执行解析操作。
 
-上面是XML文件中的对dubbo标签的描述。那么即使我写了dubbo标签这又该由谁来解析呢？毕竟Spring可能是没有默认针对dubbo标签的解析器的
+问：还有一个问题，xml文件中的xmlns是如何与NameSpaceHandler关联起来的呢？
 
-DubboNamespaceHandler 这个类里面就定义了如何解析Dubbo的各种标签。
-
-它的init方法将标签名称和对应的解析器的关系注册到Spring。这样，在Spring解析xml文件的时候，发现标签的命名空间是用户自定义的，首先会通过命名空间URL获取到对应的命名空间解析器，然后再通过标签名获取到对应的标签解析器，然后执行解析操作。
-
-还有一个问题，xml文件中的限制是如何与NameSpaceHandler关联起来的呢？
-
-在Dubbo的jar包的META-INF有一个spring.handlers文件，里面将命名空间与命名空间解析器关联起来了。
-
-http\://dubbo.apache.org/schema/dubbo=com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler
-http\://code.alibabatech.com/schema/dubbo=com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler
+> 在Dubbo的jar包的META-INF有一个spring.handlers文件，里面将命名空间与命名空间解析器关联起来了。
+> http\://dubbo.apache.org/schema/dubbo=com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler
+> http\://code.alibabatech.com/schema/dubbo=com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler
 
 回到源码，假设现在正在解析这个标签
 
