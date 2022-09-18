@@ -274,6 +274,7 @@ protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate d
 }
 ```
 **阶段性总结**
+
 如果是默认标签接下来怎么做？
 1. 根据标签类型调用对应解析方法
 2. 如果是beans标签无非就是继续递归
@@ -294,10 +295,10 @@ BeanDefinitionHolder和BeanDefinition有什么区别？
 * 解析其余ChildNode属性。
 
 Attribute属性和ChildNode有什么区别？
-> <bean id="20162501" name="欧阳">
->    <meta key="beanName" value="beanDefinition"/>
->    <qualifier value="a" type="java.lang.Integer"/>
-> </bean>
+> /<bean id="20162501" name="欧阳">
+>    /<meta key="beanName" value="beanDefinition"/>
+>    /<qualifier value="a" type="java.lang.Integer"/>
+> /</bean>
 > 就拿这个bean标签举例，attribute就是标签内部的元素也就是id和name。ChildNode子节点就是meta节点和qualifier节点，它是被bean包含的结点。
 
 ```java
