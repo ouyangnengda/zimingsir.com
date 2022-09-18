@@ -502,7 +502,7 @@ Spring是如何解析默认标签的呢？
 
 回到源码，假设现在正在解析这个标签
 
-<dubbo:registry address="${dubbo.registry.address}" timeout="${dubbo.provider.timeout}" />
+/<dubbo:registry address="www.baidu.com" timeout="10000" />
 
 首先获取标签的URI，然后通过URI获取到对应的NameSpaceHandler，接着调用parse方法。
 
