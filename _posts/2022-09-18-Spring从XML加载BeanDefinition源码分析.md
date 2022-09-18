@@ -22,7 +22,7 @@ protected final void refreshBeanFactory() throws BeansException {
         DefaultListableBeanFactory beanFactory = createBeanFactory();
         beanFactory.setSerializationId(getId());
         customizeBeanFactory(beanFactory);
-		// 加载BeanDefinition。主要从XML和注解两种形式加载bean。
+        // 加载BeanDefinition。主要从XML和注解两种形式加载bean。
         loadBeanDefinitions(beanFactory);
         this.beanFactory = beanFactory;
     }
@@ -84,17 +84,17 @@ public int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStore
 ```java
 // XmlBeanDefinitionReader.class 320
 public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefinitionStoreException {
-	
-	// 使用set，避免重复加载。已加载Resource的放到set中
+    
+    // 使用set，避免重复加载。已加载Resource的放到set中
     Set<EncodedResource> currentResources = this.resourcesCurrentlyBeingLoaded.get();
     if (!currentResources.add(encodedResource)) {...}
-	// 将资源转成输入流的形式
+    // 将资源转成输入流的形式
     try (InputStream inputStream = encodedResource.getResource().getInputStream()) {
         InputSource inputSource = new InputSource(inputStream);
         if (encodedResource.getEncoding() != null) {
             inputSource.setEncoding(encodedResource.getEncoding());
         }
-		// 从这里进去
+        // 从这里进去
         return doLoadBeanDefinitions(inputSource, encodedResource.getResource());
     }
     catch (IOException ex) {...}
@@ -166,7 +166,7 @@ protected void doRegisterBeanDefinitions(Element root) {
 
     BeanDefinitionParserDelegate parent = this.delegate;
     this.delegate = createDelegate(getReaderContext(), root, parent);
-	// 如果当前是默认标签，验证是否合法
+    // 如果当前是默认标签，验证是否合法
     if (this.delegate.isDefaultNamespace(root)) {
         String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
         if (StringUtils.hasText(profileSpec)) {
@@ -181,7 +181,7 @@ protected void doRegisterBeanDefinitions(Element root) {
             }
         }
     }
-	// 钩子方法
+    // 钩子方法
     preProcessXml(root);
     parseBeanDefinitions(root, this.delegate);
     postProcessXml(root);
@@ -191,14 +191,14 @@ protected void doRegisterBeanDefinitions(Element root) {
 
 // DefaultBeanDefinitionDocumentReader.class 168
 protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate delegate) {
-	// 如果是头部标签则获取子节点然后遍历加载。
+    // 如果是头部标签则获取子节点然后遍历加载。
     if (delegate.isDefaultNamespace(root)) {
         NodeList nl = root.getChildNodes();
         for (int i = 0; i < nl.getLength(); i++) {
             Node node = nl.item(i);
             if (node instanceof Element) {
                 Element ele = (Element) node;
-				// 迭代判断是默认标签还是用户自定义标签
+                // 迭代判断是默认标签还是用户自定义标签
                 if (delegate.isDefaultNamespace(ele)) {
                     parseDefaultElement(ele, delegate);
                 }
@@ -209,7 +209,7 @@ protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate d
         }
     }
     else {
-		// 到了这里说明是用户自定义的标签，那么得用用户自定义的解析器来解析。例如Dubbo
+        // 到了这里说明是用户自定义的标签，那么得用用户自定义的解析器来解析。例如Dubbo
         delegate.parseCustomElement(root);
     }
 }
@@ -251,10 +251,10 @@ private void parseDefaultElement(Element ele, BeanDefinitionParserDelegate deleg
 ```java
 // DefaultBeanDefinitionDocumentReader.class 305
 protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
-	// 将Element解析为Holder
+    // 将Element解析为Holder
     BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
     if (bdHolder != null) {
-		// 不知道
+        // 不知道
         bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
         try {
             // 将Holder注册到Spring
@@ -302,34 +302,34 @@ public BeanDefinitionHolder parseBeanDefinitionElement(Element ele) {
 // BeanDefinitionParserDelegate.class 414
 public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
     // <bean id="20162501" name="欧阳,子明"/>
-	// 这里是获取id也就是20162501
-	String id = ele.getAttribute(ID_ATTRIBUTE);
-	// 这里是获取name属性，也就是欧阳,子明
+    // 这里是获取id也就是20162501
+    String id = ele.getAttribute(ID_ATTRIBUTE);
+    // 这里是获取name属性，也就是欧阳,子明
     String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 
-	// 将name属性解析为别名。
+    // 将name属性解析为别名。
     List<String> aliases = new ArrayList<>();
     if (StringUtils.hasLength(nameAttr)) {
-		// 根据,或者;分割name属性，然后添加到别名数组中。分割之后为 ["欧阳","子明"]
+        // 根据,或者;分割name属性，然后添加到别名数组中。分割之后为 ["欧阳","子明"]
         String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
         aliases.addAll(Arrays.asList(nameArr));
     }
 
     String beanName = id;
-	// 如果没有设置id，将name的第一个名称设置为id。也就是欧阳
+    // 如果没有设置id，将name的第一个名称设置为id。也就是欧阳
     if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
         beanName = aliases.remove(0);
     }
 
-	// 判断beanName和aliases中的别名是不是全局唯一。如果不是全局唯一则抛错。
+    // 判断beanName和aliases中的别名是不是全局唯一。如果不是全局唯一则抛错。
     if (containingBean == null) {
         checkNameUniqueness(beanName, aliases, ele);
     }
-	
-	// 将Element解析为beanDefinition。基本思路就是获取Element中对应的属性，然后将属性set到beanDefinition中。
+    
+    // 将Element解析为beanDefinition。基本思路就是获取Element中对应的属性，然后将属性set到beanDefinition中。
     AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
     if (beanDefinition != null) {
-		// 如果这个bean既没有定义id也没有定义name，那就将类名作为beanName。
+        // 如果这个bean既没有定义id也没有定义name，那就将类名作为beanName。
         if (!StringUtils.hasText(beanName)) {}
         String[] aliasesArray = StringUtils.toStringArray(aliases);
         return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
@@ -365,7 +365,7 @@ public BeanDefinitionHolder decorateBeanDefinitionIfRequired(
     //<bean id="12" xml:id="asdf">
     //    <dubbo:consumer check="false"/>
     //</bean>
-	// 用于解析子标签中的用户自定义标签，上面的dubbo就是用户自定义标签。
+    // 用于解析子标签中的用户自定义标签，上面的dubbo就是用户自定义标签。
     NodeList children = ele.getChildNodes();
     for (int i = 0; i < children.getLength(); i++) {
         Node node = children.item(i);
@@ -506,13 +506,13 @@ public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition c
     if (namespaceUri == null) {
         return null;
     }
-	// 通过命名空间URI获取到对应的命名空间解析器，也就是：DubboNameSpaceHandler
+    // 通过命名空间URI获取到对应的命名空间解析器，也就是：DubboNameSpaceHandler
     NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
     if (handler == null) {
         error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);
         return null;
     }
-	// 从这里进去
+    // 从这里进去
     return handler.parse(ele, new ParserContext(this.readerContext, this, containingBd));
 }
 ```
