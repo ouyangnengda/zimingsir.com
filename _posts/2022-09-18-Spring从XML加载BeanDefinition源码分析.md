@@ -30,7 +30,7 @@ protected final void refreshBeanFactory() throws BeansException {
 }
 ```
 
-创建一个Reader，也就是读取器，它的作用是将我们配置的XML形式的bean加载到Spring中，然后进行一些配置文件的设置，接着开始加载
+创建一个Reader，也就是读取器，它的作用是将我们配置的XML形式的bean加载到Spring中。
 
 ```java
 // AbstractXmlApplicationContext.class 81
@@ -38,7 +38,6 @@ protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throw
     // 创建一个Reader，就是它把我们配置在XML中的bean加载到Spring中
     XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
-    // Resolver的作用是
     beanDefinitionReader.setEnvironment(this.getEnvironment());
     beanDefinitionReader.setResourceLoader(this);
     beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
@@ -56,10 +55,12 @@ ClassPath这种加载方式先会把我们的配置加载成Resource，然后依
 ```java
 // AbstractXmlApplicationContext.class 121
 protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansException, IOException {
+    // 从Resource加载
     Resource[] configResources = getConfigResources();
     if (configResources != null) {
         reader.loadBeanDefinitions(configResources);
     }
+    // 从configLocations加载，本质也是先把configLocations转成Resource，再调用上面这个加载方法
     String[] configLocations = getConfigLocations();
     if (configLocations != null) {
         reader.loadBeanDefinitions(configLocations);
@@ -69,7 +70,7 @@ protected void loadBeanDefinitions(XmlBeanDefinitionReader reader) throws BeansE
 public int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException {
     Assert.notNull(resources, "Resource array must not be null");
     int count = 0;
-    // 有多个Rescouce则循环加载
+    // 有多个Resource则循环加载
     for (Resource resource : resources) {
         count += loadBeanDefinitions(resource);
     }
