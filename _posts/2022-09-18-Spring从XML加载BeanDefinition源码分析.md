@@ -22,7 +22,7 @@ protected final void refreshBeanFactory() throws BeansException {
         DefaultListableBeanFactory beanFactory = createBeanFactory();
         beanFactory.setSerializationId(getId());
         customizeBeanFactory(beanFactory);
-        // 加载BeanDefinition。主要从XML和注解两种形式加载bean。
+        // 加载BeanDefinition。我们使用Spring主要从XML和注解两种形式加载bean。
         loadBeanDefinitions(beanFactory);
         this.beanFactory = beanFactory;
     }
