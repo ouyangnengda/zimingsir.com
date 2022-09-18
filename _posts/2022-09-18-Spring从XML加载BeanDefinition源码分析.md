@@ -165,8 +165,6 @@ public void registerBeanDefinitions(Document doc, XmlReaderContext readerContext
 }
 ```
 
-验证什么东西是否合法
-
 **解析默认标签（import，alias，bean，beans）和用户自定义标签**
 
 ```java
@@ -218,7 +216,7 @@ protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate d
         }
     }
     else {
-        // 到了这里说明是用户自定义的标签，那么得用用户自定义的解析器来解析。例如Dubbo
+        // 到了这里说明是用户自定义的标签，那么得用用户自定义的解析器来解析。例如DubboNameSpaceHandler
         delegate.parseCustomElement(root);
     }
 }
