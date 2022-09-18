@@ -10,9 +10,9 @@ category: spring
 Spring的版本是 5.2.6.RELEASE
 Dubbo版本是 2.6.2
 
-本文是Spring IOC 初始化流程的一部分，回到初始化过程中的 refreshBeanFacotry 方法。
+本文是Spring IOC 初始化流程的一部分，回到初始化过程中的 refreshBeanFactory 方法。
 
-本文分析从XML中加的源码逻辑。
+本文分析从XML中加载的源码逻辑。
 
 ```java
 // AbstractRefreshableApplicationContext.class 121
@@ -51,7 +51,7 @@ protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throw
 }
 ```
 
-**从Resource资源和ClassPath类型的资源加载。**
+**从Resource资源和ClassPath类型的资源加载**
 
 ClassPath这种加载方式先会把我们的配置加载成Resource，然后依然使用Resource的方式去加载。
 
@@ -106,7 +106,7 @@ public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefin
 }
 ```
 
-这是Reader的核心方法了，这里做两个事：**将输入流加载成Document**，**将Document注册到Spring中**。
+这是Reader的核心方法了，这里做两个事：**将输入流加载成Document，将Document注册到Spring中**。
 
 ```java
 // XmlBeanDefinitionReader.class 386
@@ -224,7 +224,7 @@ protected void parseBeanDefinitions(Element root, BeanDefinitionParserDelegate d
 
 先关注bean标签如何解析，后续关注用户自定义标签如何解析
 
-#### 解析Spring默认标签
+### 解析Spring默认标签
 
 如果是Spring默认一级标签，调用对应的解析方法。
 
@@ -283,9 +283,11 @@ protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate d
 5. 修饰BeanDefinitionHolder
 6. 将BeanDefinitionHolder注册到Spring。
 
+
 BeanDefinitionHolder和BeanDefinition有什么区别？
 > 包含关系。BeanDefinitionHolder包含一个BeanDefinition、beanName以及别名列表，这些数据后续都需要注册到Spring中。
 > 看下BeanDefinitionHolder类就很清楚了。
+
 
 那么将Element解析成BeanDefinitionHolder这个操作具体是怎么做的呢？
 * 解析id元素
@@ -293,6 +295,7 @@ BeanDefinitionHolder和BeanDefinition有什么区别？
 * 通过id和name确定这个bean的唯一标识也就是:beanName
 * 解析其余的Attribute属性
 * 解析其余ChildNode属性。
+
 
 Attribute属性和ChildNode有什么区别？
 ```xml
@@ -479,7 +482,7 @@ Spring是如何解析默认标签的呢？
 * 如果有用户自定义的属性和标签也需要解析一下，这是 decorateBeanDefinitionIfRequired 这个方法的作用。
 * 将beanDefinition和别名alias注册到Spring的map中。
 
-#### 解析用户自定义标签
+### 解析用户自定义标签
 
 这是Spring扩展性的优秀实现。
 
@@ -501,6 +504,7 @@ Spring是如何解析默认标签的呢？
 > 在Dubbo的jar包的META-INF有一个spring.handlers文件，里面将命名空间与命名空间解析器关联起来了。
 > http\://dubbo.apache.org/schema/dubbo=com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler
 > http\://code.alibabatech.com/schema/dubbo=com.alibaba.dubbo.config.spring.schema.DubboNamespaceHandler
+
 
 回到源码，假设现在正在解析这个标签
 
