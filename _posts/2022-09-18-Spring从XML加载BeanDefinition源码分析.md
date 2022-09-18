@@ -7,6 +7,9 @@ category: spring
 
 本文分析Spring是如何将我们定义的Bean加载到Spring容器中。
 
+Spring的版本是 5.2.6.RELEASE
+Dubbo版本是 2.6.2
+
 本文是Spring IOC 初始化流程的一部分，回到初始化过程中的 refreshBeanFacotry 方法。
 
 本文分析从XML中加的源码逻辑。
@@ -106,7 +109,7 @@ public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefin
 这是Reader的核心方法了，这里做两个事：**将输入流加载成Document**，**将Document注册到Spring中**。
 
 ```java
-// XmlBeanDefinitionReader.class 320
+// XmlBeanDefinitionReader.class 386
 protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
         throws BeanDefinitionStoreException {
 
@@ -127,7 +130,12 @@ protected int doLoadBeanDefinitions(InputSource inputSource, Resource resource)
 }
 ```
 
-**需要Document，Element，Node之间的关系**
+**Document，Element，Node之间的关系**
+> Node指的是XML中的一个节点，这是w3c定义的。
+> XML中的Node有很多种类型，其中一种是Element，我理解Element就是XML中的标签。
+> XML中的Node还一种类型是Attribute，它其实就是Element的一个属性，<bean id="123"/>，例如id就是一个Attribute。
+> Document是XML文件对应的一个实体，它是一个树状结构。
+> 它有一个根节点是Element类型的，每个Element包含一个子Element列表和Attribute列表。
 
 **阶段性总结**
 到这里我们总结一下前面的步骤。
