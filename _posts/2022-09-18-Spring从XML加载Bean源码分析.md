@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Spring从XML加载BeanDefinition源码分析"
+title: "Spring从XML加载Bean源码分析"
 data: 2022-09-18 16:58:00 -0000
 category: spring
 ---

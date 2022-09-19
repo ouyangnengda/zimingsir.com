@@ -6,7 +6,9 @@
 
 [SpringIOC源码分析](https://zimingsir.com/spring/SpringIOC源码分析.html)
 
-[Spring从XML加载BeanDefinition源码分析](https://zimingsir.com/spring/Spring从XML加载BeanDefinition源码分析.html)
+[Spring从XML加载Bean源码分析](https://zimingsir.com/spring/Spring从XML加载Bean源码分析.html)
+
+[Spring从注解加载Bean源码分析](https://zimingsir.com/spring/Spring从注解加载Bean源码分析.html)
 
 [SpringAOP源码分析](https://zimingsir.com/spring/SpringAOP源码分析.html)
 
