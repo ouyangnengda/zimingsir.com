@@ -36,7 +36,7 @@ protected final void refreshBeanFactory() throws BeansException {
 }
 ```
 
-假设我们扫描的配置如下，它会注册Application.class，以及com.zimingsir包下所有被@Component注解的类。
+假设我们扫描的配置如下，它会注册Application.class和com.zimingsir包下所有被@Component注解的类。
 
 ```java
 @ComponentScan(basePackageClasses = {Application.class}, basePackages = "com.zimingsir")
